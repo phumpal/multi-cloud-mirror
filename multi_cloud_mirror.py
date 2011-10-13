@@ -111,6 +111,7 @@ class MultiCloudMirror:
    LOG_WARN=2
    LOG_INFO=1
    LOG_DEBUG=0
+   CF_MAX_OBJECTS_IN_LIST=10000
 
    def __init__(self, sync=None, numProcesses=4, maxFileSize=5368709120, emailDest='', emailSrc='',
                 emailSubj="[Multi-Cloud Mirror] Script Run at %s" % (str(datetime.datetime.now())),
