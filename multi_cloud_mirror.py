@@ -169,11 +169,22 @@ class MultiCloudMirror:
       """
       Open connections and list files in buckets/containers
       """
+      # There's a limit in Cloud Files per listing of objects, so we get the Cloud Files list here
+      # (to maximize code reuse)
+      cfBucketName = destBucketName if srcService == 's3' else srcBucketName
+      # Because the cloudfiles.ObjectResults class can't easily be appended to, we make a new list
+      cfList = []
+      cfList.extend(self.cfConn.get_container(cfBucketName).get_objects())
+      lastLen = len(cfList)
+      while lastLen == self.CF_MAX_OBJECTS_IN_LIST:
+         cfList.extend(self.cfConn.get_container(cfBucketName).get_objects(marker=cfList[-1].name))
+         lastLen = len(cfList) - lastLen
+      # Now assign bucket/container lists to class lists
       if srcService == 's3':
          self.srcList        = self.s3Conn.get_bucket(srcBucketName).list()
-         self.destList       = self.cfConn.get_container(destBucketName).get_objects()
+         self.destList       = cfList
       elif srcService == 'cf':
-         self.srcList        = self.cfConn.get_container(srcBucketName).get_objects()
+         self.srcList        = cfList
          self.destList       = self.s3Conn.get_bucket(destBucketName).list()
       # Loop through the files at the destination
       for dKey in self.destList:
