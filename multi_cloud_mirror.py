@@ -304,16 +304,16 @@ class MultiCloudMirror:
          try:
             self.connectToBuckets(srcService, srcBucketName, destBucketName)
          except (S3ResponseError, S3PermissionsError), err:
-            self.logItem("Error in connecting to S3 bucket %s: [%d] %s" % (s3BucketName, err.status, err.reason), self.LOG_WARN)
+            self.logItem("Error in connecting to S3 bucket: [%d] %s" % (err.status, err.reason), self.LOG_WARN)
             continue
          except (ResponseError, NoSuchContainer, InvalidContainerName, InvalidUrl, ContainerNotPublic, AuthenticationFailed, AuthenticationError), err:
-            self.logItem("Error in connecting to CF container %s: %s" % (cfBucketName, err), self.LOG_WARN)
+            self.logItem("Error in connecting to CF container: %s" % (err), self.LOG_WARN)
             continue
          # Iterate through files at the source to see which ones to copy, and put them on the multiprocessing queue:
          for sKey in self.srcList:
             self.checkAndCopy(sKey, srcService, srcBucketName, destBucketName)
       self.waitForJobstoFinish()
-      self.logItem("Multi-Cloud Mirror Script ended at %s" % (str(datetime.datetime.now())), self.LOG_INFO)
+      self.logItem("\n\nMulti-Cloud Mirror Script ended at %s" % (str(datetime.datetime.now())), self.LOG_INFO)
       self.sendStatusEmail()
 
 
